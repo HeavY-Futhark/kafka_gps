@@ -1,6 +1,6 @@
 from confluent_kafka import Producer
 import json
-from producer.src.coordinate_generation import generate_gps_coordinates
+from producer.src.coordinate_tracker import generate_gps_coordinates, CoordinateTracker
 
 # Fonction de callback pour rapport de livraison des messages
 def delivery_report(err,msg):
@@ -25,6 +25,14 @@ def create_gps_messages(bootstrap_servers='localhost:9092', topic='coordinates',
     generated_coordinates = []
 
     try:
+
+        # Création d'une instance de CoordinateTracker avec des valeurs initiales
+        initial_coordinates = generate_gps_coordinates()
+        initial_speed = 10.0
+        initial_direction = 15.0
+        tracker = CoordinateTracker(initial_coordinates['latitude'], initial_coordinates['longitude'],
+                                     initial_speed, initial_direction)
+
         # Boucle pour générer et envoyer le nombre spécifié de messages GPS
         for _ in range(num_messages):
             #Génération de coordonnées GPS
@@ -37,6 +45,8 @@ def create_gps_messages(bootstrap_servers='localhost:9092', topic='coordinates',
             producer.produce(topic,value=message_value,callback=delivery_report)
             #Forçage de l'envoi immédiat du message (utile dans ce contexte)
             #producer.flush()
+            time_elapsed = 1.0
+            tracker.update_position(time_elapsed)
 
     except KeyboardInterrupt:
         pass
