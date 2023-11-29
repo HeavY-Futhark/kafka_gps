@@ -1,7 +1,3 @@
-import os
-import sys
-project_directory = os.path.abspath('.')
-sys.path.append(project_directory)
 from src.api_coordinates import create_api
 from services.coordinate_services import DataBaseManager
 
