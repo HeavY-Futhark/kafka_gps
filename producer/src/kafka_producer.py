@@ -1,6 +1,6 @@
 from confluent_kafka import Producer
 import json
-from coordinate_generation import generate_gps_coordinates
+from producer.src.coordinate_generation import generate_gps_coordinates
 
 # Fonction de callback pour rapport de livraison des messages
 def delivery_report(err,msg):
@@ -36,7 +36,7 @@ def create_gps_messages(bootstrap_servers='localhost:9092', topic='coordinates',
             #Envoi du message au topic kafka specifié via la fonction de callback
             producer.produce(topic,value=message_value,callback=delivery_report)
             #Forçage de l'envoi immédiat du message (utile dans ce contexte)
-            producer.flush()
+            #producer.flush()
 
     except KeyboardInterrupt:
         pass
