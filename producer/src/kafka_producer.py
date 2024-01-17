@@ -1,6 +1,6 @@
 from confluent_kafka import Producer
 import json
-from producer.src.coordinate_tracker import generate_gps_coordinates, CoordinateTracker
+from coordinate_tracker import generate_gps_coordinates, CoordinateTracker
 
 # Fonction de callback pour rapport de livraison des messages
 def delivery_report(err,msg):
