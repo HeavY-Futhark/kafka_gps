@@ -8,6 +8,7 @@ def create_api(DataBaseClass: Type) -> FastAPI:
     id/coordinate in the "data" field,
     - GET /coordinate_id/{id}: Read the coordinates for the given id and
     returns it in the "data" field.
+    - GET /latest_coordinates: Read the latest coordinates for each ip
     
     Parameters:
         DataBaseClass (Class): Class that will be used to get the data
@@ -45,5 +46,27 @@ def create_api(DataBaseClass: Type) -> FastAPI:
             coordinate as a value
         """
         return {"id": id_, "data": bdd.readOne(id_)}
+
+    @app.get("/latest_coordinates")
+    def get_latest_coordinates() -> dict[str, any]:
+        """ Reads the latest coordinates for each ip address and returns it
+
+        Returns:
+            (dict[str, any]): "data" and array of latest coordinates as value
+        """
+        data = bdd.readAll()
+        data_map = {}
+        for line in data:
+            if line.ip not in data_map:
+                data_map[line.ip] = []
+            data_map[line.ip].append(line)
+        data_latest = [
+            max(
+                data_map[value_ip],
+                key = lambda x:x.time
+            )
+            for value_ip in line.keys()
+        ]
+        return data_latest
 
     return app
