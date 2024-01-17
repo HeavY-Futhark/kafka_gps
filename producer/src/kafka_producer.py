@@ -1,64 +1,62 @@
-from confluent_kafka import Producer
 import json
+import logging
+import time
+from confluent_kafka import Producer
 from coordinate_tracker import generate_gps_coordinates, CoordinateTracker
 
-# Fonction de callback pour rapport de livraison des messages
-def delivery_report(err,msg):
-    # Si une erreur est présente on affiche un message d'échec
-    if (err != None):
-        print('Message delivery failed: {}'.format(err))
+# Fonction de rappel pour les rapports de livraison
+def delivery_report(err, msg):
+    if err is not None:
+        logging.error(f'Échec de la livraison du message : {err}')
     else:
-        # Sinon, affiche un message indiquant que le message a été livré avec succès,
-        # avec le nom du sujet (topic) et le numéro de partition associé
-        print('Message delivered to {} [{}]'.format(msg.topic(), msg.partition()))
+        logging.info(f'Message livré à {msg.topic()} [{msg.partition()}]')
 
 # Fonction pour créer et envoyer des messages GPS à Kafka
-def create_gps_messages(bootstrap_servers='localhost:9092', topic='coordinates', num_messages=1 ):
-    # Configuration du client Kafka, avec le serveur d'amorçage par défaut 'localhost:9092'
+def create_gps_messages(bootstrap_servers='localhost:9092', topic='coordinates', num_messages=1):
+    # Configuration du producteur Kafka
     config = {
-        'bootstrap.servers' : bootstrap_servers
+        'bootstrap.servers': bootstrap_servers
     }
-
-    # Création d'une instance de producteur Kafka avec la configuration spécifiée
     producer = Producer(config)
-    # Liste pour stocker les coordonnées GPS générées
     generated_coordinates = []
 
+    # Génération de coordonnées GPS initiales
+    initial_coordinates = generate_gps_coordinates()
+    initial_speed = 10.0
+    initial_direction = 15.0
+    # Initialisation du suivi des coordonnées
+    tracker = CoordinateTracker(initial_coordinates['latitude'], initial_coordinates['longitude'],
+                                 initial_speed, initial_direction)
+
     try:
-
-        # Création d'une instance de CoordinateTracker avec des valeurs initiales
-        initial_coordinates = generate_gps_coordinates()
-        initial_speed = 10.0
-        initial_direction = 15.0
-        tracker = CoordinateTracker(initial_coordinates['latitude'], initial_coordinates['longitude'],
-                                     initial_speed, initial_direction)
-
-        # Boucle pour générer et envoyer le nombre spécifié de messages GPS
         for _ in range(num_messages):
-            #Génération de coordonnées GPS
-            gps_coordinates = generate_gps_coordinates()
-            #Ajout des coordonnées GPS
+            # Mise à jour de la position toutes les secondes
+            tracker.update_position(1.0)
+            # Récupération des coordonnées GPS
+            gps_coordinates = tracker.get_coordinates()
             generated_coordinates.append(gps_coordinates)
-            #Conversion des coordonnées en json
+            # Conversion des coordonnées en JSON et envoi au topic Kafka
             message_value = json.dumps(gps_coordinates)
-            #Envoi du message au topic kafka specifié via la fonction de callback
-            producer.produce(topic,value=message_value,callback=delivery_report)
-            #Forçage de l'envoi immédiat du message (utile dans ce contexte)
-            #producer.flush()
-            time_elapsed = 1.0
-            tracker.update_position(time_elapsed)
+            producer.produce(topic, value=message_value, callback=delivery_report)
+
+            # Sondage du producteur pour les événements, y compris les rapports de livraison
+            producer.poll(0)
+
+            # Simulation du temps écoulé pour la génération de la prochaine coordonnée GPS
+            time.sleep(1.0)
 
     except KeyboardInterrupt:
-        pass
+        # Interruption par l'utilisateur (Ctrl+C)
+        logging.info("Producteur interrompu. Sortie en cours...")
     finally:
-        # Forçage de l'envoi de tout message restant et fermeture du producteur
+        # Attente de la livraison de tous les messages en attente et fermeture du producteur
         producer.flush()
-        #producer.close()
+        logging.info("Producteur fermé.")
+
     return generated_coordinates
 
-
 if __name__ == "__main__":
-    # Appel de la fonction create_gps_messages lors de l'exécution du script
+    # Configuration du journal (logging)
+    logging.basicConfig(level=logging.INFO)
     generated_coordinates = create_gps_messages()
-    # Affichage des coordonnées GPS générées
-    print("Generated Coordinates:", generated_coordinates)
+    logging.info(f"Coordonnées générées : {generated_coordinates}")
