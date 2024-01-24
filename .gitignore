@@ -1,3 +1,7 @@
 *.swp
 */__pycache__/
 
+frontentd/my-app/node_modules/
+frontentd/my-app/public/build/
+
+frontentd/my-app.DS_Store
