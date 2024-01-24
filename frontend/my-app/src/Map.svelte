@@ -22,9 +22,9 @@
 
     var marker_icon = L.icon({
       iconUrl: 'assets/marker.png',
-      iconSize:     [48, 48],
+      iconSize:     [48, 48], // size of the icon
       iconAnchor: [24, 48],
-      popupAnchor:  [0, -32]
+      popupAnchor:  [0, -32] // point from which the popup should open relative to the iconAnchor
     });
     var marker = L.marker([51.5, -0.09], {icon: marker_icon}).addTo(map);
 
