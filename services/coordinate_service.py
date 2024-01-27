@@ -17,7 +17,7 @@ class DatabaseManager:
         """Initialize the DatabaseManager instance."""
         if self._initialized:
             return
-        self.host = "127.0.0.1"
+        self.host = "0.0.0.0"
         self.port = "5432"
         self.database = "coords"
         self.user = "micro_user"

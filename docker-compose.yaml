@@ -1,0 +1,54 @@
+version: '3.1'
+
+services:
+  fontend:
+    build:
+      context: .
+      dockerfile: ./docker/frontend.dockerfile
+    ports:
+      - 8080:8000
+    networks:
+      - frontend
+  producer:
+    build:
+      context: .
+      dockerfile: ./docker/producer.dockerfile
+    environment:
+      - IP_PRODUCER = 'ip1'
+    networks:
+      - backend
+  consumer:
+    build:
+      context: .
+      dockerfile: ./docker/consumer.dockerfile
+    networks:
+      - backend
+  api:
+    build:
+      context: .
+      dockerfile: ./docker/api.dockerfile
+    networks:
+      - frontend
+      - backend
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - backend
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - backend
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
