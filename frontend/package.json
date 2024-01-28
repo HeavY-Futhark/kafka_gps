@@ -19,6 +19,7 @@
     "svelte": "^3.55.0"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "leaflet": "^1.9.4",
     "sirv-cli": "^2.0.0"
   }

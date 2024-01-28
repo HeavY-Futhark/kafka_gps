@@ -17,8 +17,8 @@ class DatabaseManager:
         """Initialize the DatabaseManager instance."""
         if self._initialized:
             return
-        self.host = "0.0.0.0"
-        self.port = "5432"
+        self.host = "db"
+        self.port = 5432
         self.database = "coords"
         self.user = "micro_user"
         self.password = "password"
@@ -103,7 +103,7 @@ class DatabaseManager:
             rows = self.cursor.fetchall()
 
             for row in rows:
-                coord_id, ip, latitude, longitude, timestamp = row
+                coord_id, ip, timestamp, latitude, longitude = row
                 result_dict[coord_id] = Coordinate(ip, timestamp, latitude, longitude)
 
         except Exception as e:
@@ -135,22 +135,23 @@ class DatabaseManager:
 
         return result
 
-# Example usage:
-coord_entry = Coordinate(
-    latitude=12.345, longitude=45.678, time=datetime.now(), ip="127.0.0.1"
-)
-# DatabaseManager.create_db()
-db_manager = DatabaseManager()
-db_manager.insert_data(coord_entry)
+if __name__ == '__main__':
+    # Example usage:
+    coord_entry = Coordinate(
+        latitude=12.345, longitude=45.678, time=datetime.now(), ip="127.0.0.1"
+    )
+    # DatabaseManager.create_db()
+    db_manager = DatabaseManager()
+    db_manager.insert_data(coord_entry)
 
-# Example for readAll
-all_data = db_manager.readAll()
-print(all_data)
+    # Example for readAll
+    all_data = db_manager.readAll()
+    print(all_data)
 
-# Example for readOne
-entry_id = 1
-specific_entry = db_manager.readOne(entry_id)
-if specific_entry:
-    print(f"Data for ID {entry_id}: {specific_entry.to_json()}")
-else:
-    print(f"No data found for ID {entry_id}")
+    # Example for readOne
+    entry_id = 1
+    specific_entry = db_manager.readOne(entry_id)
+    if specific_entry:
+        print(f"Data for ID {entry_id}: {specific_entry.to_json()}")
+    else:
+        print(f"No data found for ID {entry_id}")

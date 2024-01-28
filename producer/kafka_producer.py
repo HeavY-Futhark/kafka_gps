@@ -15,7 +15,8 @@ def delivery_report(err, msg):
         logging.info(f'Message livré à {msg.topic()} [{msg.partition()}]')
 
 # Fonction pour créer et envoyer des messages GPS à Kafka
-def create_gps_messages(bootstrap_servers='0.0.0.0:9092', topic='coordinates', num_messages=1):
+# num_messages = 0 pour infini
+def create_gps_messages(bootstrap_servers='kafka:9092', topic='coordinates', num_messages=0):
     # Configuration du producteur Kafka
     config = {
         'bootstrap.servers': bootstrap_servers
@@ -24,15 +25,16 @@ def create_gps_messages(bootstrap_servers='0.0.0.0:9092', topic='coordinates', n
     generated_coordinates = []
 
     # Génération de coordonnées GPS initiales
-    initial_coordinates = generate_gps_coordinates()
-    initial_speed = 10.0
+    initial_coordinates = {'latitude': 43.30, 'longitude': -0.37}
+    initial_speed = 0.05
     initial_direction = 15.0
     # Initialisation du suivi des coordonnées
     tracker = CoordinateTracker(ip, initial_coordinates['latitude'], initial_coordinates['longitude'],
                                  initial_speed, initial_direction)
 
     try:
-        for _ in range(num_messages):
+        iterator = iter(int, 1) if num_messages == 0 else range(num_messages)
+        for _ in iterator:
             # Mise à jour de la position toutes les secondes
             tracker.update_position(1.0)
             # Récupération des coordonnées GPS

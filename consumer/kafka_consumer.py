@@ -5,7 +5,7 @@ from services.coordinate_service import DatabaseManager
 from models.coordinate_model import Coordinate
 
 # Fonction pour consommer des coordonnées GPS depuis Kafka
-def consume_gps_coordinates(bootstrap_servers='0.0.0.0:9092', group_id='gps_consumer_group', topic='coordinates'):
+def consume_gps_coordinates(bootstrap_servers='kafka:9092', group_id='gps_consumer_group', topic='coordinates'):
     # Configuration du consommateur Kafka
     config = {
         'bootstrap.servers': bootstrap_servers,
@@ -59,7 +59,7 @@ def consume_gps_coordinates(bootstrap_servers='0.0.0.0:9092', group_id='gps_cons
 def process_gps_coordinates(coordinates, databaseManager):
     # Traitement des coordonnées GPS reçues
     logging.info(f"Traitement des coordonnées GPS : {coordinates}")
-    databaseManager.inser_data(coordinates)
+    databaseManager.insert_data(coordinates)
 
 if __name__ == "__main__":
     # Configuration du journal (logging)

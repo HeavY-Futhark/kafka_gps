@@ -1,5 +1,6 @@
 CREATE DATABASE coords;
 \c coords;
+
 CREATE USER micro_user WITH ENCRYPTED PASSWORD 'password';
 GRANT ALL PRIVILEGES ON DATABASE coords TO micro_user;
 
@@ -10,3 +11,7 @@ CREATE TABLE coord (
 	latitude NUMERIC,
 	longitude NUMERIC
 );
+
+GRANT INSERT, SELECT ON TABLE coord TO micro_user;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO micro_user;
+

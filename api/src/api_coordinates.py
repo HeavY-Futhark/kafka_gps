@@ -56,7 +56,7 @@ def create_api(DataBaseClass: Type) -> FastAPI:
         """
         data = bdd.readAll()
         data_map = {}
-        for line in data:
+        for line in data.values():
             if line.ip not in data_map:
                 data_map[line.ip] = []
             data_map[line.ip].append(line)
@@ -65,7 +65,7 @@ def create_api(DataBaseClass: Type) -> FastAPI:
                 data_map[value_ip],
                 key = lambda x:x.time
             )
-            for value_ip in line.keys()
+            for value_ip in data_map.keys()
         ]
         return data_latest
 

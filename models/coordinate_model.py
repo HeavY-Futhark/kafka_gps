@@ -107,7 +107,7 @@ class Coordinate:
     data: dict[str, str] = load_json(attributes)
     return Coordinate(
       data["ip"],
-      datetime.fromtimestamp(int(data["time"])),
+      datetime.fromtimestamp(int(float(data["time"]))),
       float(data["latitude"]),
       float(data["longitude"])
     )

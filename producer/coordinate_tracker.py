@@ -14,21 +14,24 @@ class CoordinateTracker:
 
     def update_position(self, time_elapsed):
         # Conversion de la direction en radians
+        self.direction += random.uniform(-45, 45)
         direction_in_radians = math.radians(self.direction)
         # Calcul des changements de latitude et longitude en fonction du temps écoulé
         delta_latitude = self.speed * math.cos(direction_in_radians) * time_elapsed
         delta_longitude = self.speed * math.sin(direction_in_radians) * time_elapsed
 
         self.latitude += delta_latitude
+        self.latitude = (self.latitude + 90) % 180 - 90
         self.longitude += delta_longitude
+        self.longitude = (self.longitude + 180) % 360 - 180
 
     def get_coordinates(self):
         # Renvoie les coordonnées actuelles
         return Coordinate(
-            self.ip,
-            datetime.now(),
-            self.latitude,
-            self.longitude
+            ip = self.ip,
+            time = datetime.now(),
+            latitude = self.latitude,
+            longitude = self.longitude
         )
 
 
