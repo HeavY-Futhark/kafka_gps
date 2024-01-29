@@ -48,3 +48,6 @@ The project exposes the following ports:
 - 8000 for the api.
 If one of these is used by another program, the creation of the corresponding
 container will be impossible.
+
+## Network issues
+When connected to eduroam, pip seems to be unable to locate the packages.
