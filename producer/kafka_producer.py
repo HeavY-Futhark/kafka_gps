@@ -2,9 +2,10 @@ import json
 import logging
 import time
 from confluent_kafka import Producer
-from coordinate_tracker import generate_gps_coordinates, CoordinateTracker
+from coordinate_tracker import CoordinateTracker
 import os
 
+# Ip of the coordinate tracked by the producer
 ip = os.environ.get("IP_PRODUCER")
 
 # Fonction de rappel pour les rapports de livraison
@@ -28,9 +29,10 @@ def create_gps_messages(bootstrap_servers='kafka:9092', topic='coordinates', num
     initial_coordinates = {'latitude': 43.30, 'longitude': -0.37}
     initial_speed = 0.05
     initial_direction = 15.0
+    angular_speed = 45
     # Initialisation du suivi des coordonnées
     tracker = CoordinateTracker(ip, initial_coordinates['latitude'], initial_coordinates['longitude'],
-                                 initial_speed, initial_direction)
+                                 initial_speed, initial_direction, angular_speed, False)
 
     try:
         iterator = iter(int, 1) if num_messages == 0 else range(num_messages)

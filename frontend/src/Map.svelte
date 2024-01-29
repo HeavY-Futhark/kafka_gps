@@ -4,7 +4,7 @@
   import L from "leaflet"
 
   onMount(() => {
-    const map = L.map("map").setView([51.505, -0.09], 13);
+    const map = L.map("map").setView([44, 0], 7);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
     var marker_icon = L.icon({
@@ -33,7 +33,7 @@
         });
     }
 
-    const updateInterval = setInterval(updateLatestCoordinate, 500);
+    const updateInterval = setInterval(updateLatestCoordinate, 200);
     onDestroy(() => clearInterval(updateInterval));
 
   });

@@ -1,1 +1,3 @@
 confluent_kafka
+global-land-mask
+numpy
